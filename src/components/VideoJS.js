@@ -1,25 +1,28 @@
 import React, { useState } from "react";
+import { Slider } from "@mui/material";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
+import Controls from "./Controls";
 
-export const VideoJS = ( props ) => {
-
+export const VideoJS = (props) => {
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
   const { onReady } = props;
 
-  const [options, setOptions] = useState({ // lookup the options in the docs for more options
+  const [options, setOptions] = useState({
+    // lookup the options in the docs for more options
     autoplay: true,
     controls: true,
     responsive: true,
     fluid: true,
-    sources: [{
-      src: 'https://s3.amazonaws.com/_bc_dml/example-content/sintel_dash/sintel_vod.mpd',
-      type: 'application/dash+xml'
-    }]
+    sources: [
+      {
+        src: "https://s3.amazonaws.com/_bc_dml/example-content/sintel_dash/sintel_vod.mpd",
+        type: "application/dash+xml",
+      },
+    ],
   });
   const [refresh, setRefresh] = useState(false);
-
 
   React.useEffect(() => {
     // make sure Video.js player is only initialized once
@@ -27,10 +30,10 @@ export const VideoJS = ( props ) => {
       const videoElement = videoRef.current;
       if (!videoElement) return;
 
-      const player = playerRef.current = videojs(videoElement, options, () => {
+      const player = (playerRef.current = videojs(videoElement, options, () => {
         console.log("player is ready");
         onReady && onReady(player);
-      });
+      }));
     } else {
       // you can update player here [update player through props]
       const player = playerRef.current;
@@ -51,18 +54,23 @@ export const VideoJS = ( props ) => {
   }, []);
 
   return (
-      <>
-    <div data-vjs-player>
-      <video ref={videoRef} className="video-js vjs-big-play-centered" />
-    </div>
-    <button onClick={() => {
-        const player = playerRef.current;
-        // player.autoplay(options.autoplay);
-        // player.src(options.sources);
-        player.requestFullscreen();       
-      }}>Hide controls</button>
-  </>
+    <>
+      <div data-vjs-player>
+        <video ref={videoRef} className="video-js vjs-big-play-centered" />
+        <Controls />
+      </div>
+      <button
+        onClick={() => {
+          const player = playerRef.current;
+          // player.autoplay(options.autoplay);
+          // player.src(options.sources);
+          player.controls(false);
+        }}
+      >
+        Hide controls
+      </button>
+    </>
   );
-}
+};
 
 export default VideoJS;
