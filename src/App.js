@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import VideoJS from './components/VideoJS' // point to where the functional component is stored
+import VideoJS from './components/VideoJS'
 
 const App = () => {
   const playerRef = React.useRef(null);
-  const [options, setOptions] = useState({ // lookup the options in the docs for more options
+  const [options, setOptions] = useState({
     autoplay: true,
     controls: true,
     responsive: true,
@@ -13,18 +13,6 @@ const App = () => {
       type: 'application/dash+xml'
     }]
   });
-  const [refresh, setRefresh] = useState(false);
-
-  const videoJsOptions = { // lookup the options in the docs for more options
-    autoplay: true,
-    controls: true,
-    responsive: true,
-    fluid: true,
-    sources: [{
-      src: 'https://s3.amazonaws.com/_bc_dml/example-content/sintel_dash/sintel_vod.mpd',
-      type: 'application/dash+xml'
-    }]
-  }
 
   const handlePlayerReady = (player) => {
     playerRef.current = player;
@@ -41,10 +29,7 @@ const App = () => {
 
   return (
     <>
-      <div>Rest of app here</div>
-
       <VideoJS options={options} onReady={handlePlayerReady} />
-
     </>
   );
 }

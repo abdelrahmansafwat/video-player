@@ -57,7 +57,7 @@ export const VideoJS = (props) => {
     <>
       <div data-vjs-player>
         <video ref={videoRef} className="video-js vjs-big-play-centered" />
-        <Controls />
+        <Controls playerRef={playerRef} />
       </div>
       <button
         onClick={() => {
