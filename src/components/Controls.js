@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Slider,
   Box,
@@ -22,6 +22,7 @@ import {
 } from "@mui/icons-material";
 
 const Controls = (props) => {
+  const [ started, setStarted ] = useState(false);
   const [ playing, setPlaying ] = useState(false);
   const [ fullscreen, setFullscreen ] = useState(false);
   const [ time, setTime ] = useState(0);
@@ -29,6 +30,37 @@ const Controls = (props) => {
   const [ oldVolume, setOldVolume ] = useState(100);
   const [ mute, setMute ] = useState(false);
   const { playerRef } = props;
+
+  const getSeconds = () => {
+    const player = playerRef.current;
+
+    let currentTime = (player.currentTime()/player.duration()) * 100;
+
+    setTime(currentTime);
+  }
+
+  const autoPlay = () => {
+    const player = playerRef.current;
+
+    if(player && player.readyState() === 1){
+      console.log(player.readyState());
+
+      player.play();
+      setPlaying(true);
+      setStarted(true);
+    }
+  }
+
+  if(!started){
+    autoPlay();
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      getSeconds();
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleFullscreen = () => {
     const player = playerRef.current;
@@ -53,6 +85,14 @@ const Controls = (props) => {
     }
     setPlaying(!playing);
   }
+
+  /*
+  useEffect(() => {
+    setInterval(() => {
+      handlePlay();
+    }, 3000);
+  }, []);
+  */
 
   const handleSeek = (event, newValue) => {
     const player = playerRef.current;

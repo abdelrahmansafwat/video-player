@@ -12,7 +12,7 @@ export const VideoJS = (props) => {
   const [options, setOptions] = useState({
     // lookup the options in the docs for more options
     autoplay: true,
-    controls: true,
+    controls: false,
     responsive: true,
     fluid: true,
     sources: [
