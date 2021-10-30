@@ -23,13 +23,13 @@ import {
 
 const Controls = (props) => {
   const [ started, setStarted ] = useState(false);
-  const [ playing, setPlaying ] = useState(false);
+  //const [ playing, setPlaying ] = useState(false);
   const [ fullscreen, setFullscreen ] = useState(false);
   const [ time, setTime ] = useState(0);
   const [ volume, setVolume ] = useState(100);
   const [ oldVolume, setOldVolume ] = useState(100);
   const [ mute, setMute ] = useState(false);
-  const { playerRef } = props;
+  const { playerRef, playing, handlePlay } = props;
 
   const getSeconds = () => {
     const player = playerRef.current;
@@ -42,11 +42,10 @@ const Controls = (props) => {
   const autoPlay = () => {
     const player = playerRef.current;
 
-    if(player && player.readyState() === 1){
+    if(player && player.readyState() > 0){
       console.log(player.readyState());
 
-      player.play();
-      setPlaying(true);
+      //player.volume(100);
       setStarted(true);
     }
   }
@@ -74,6 +73,7 @@ const Controls = (props) => {
     setFullscreen(!fullscreen);
   }
 
+  /*
   const handlePlay = () => {
     const player = playerRef.current;
 
@@ -85,6 +85,7 @@ const Controls = (props) => {
     }
     setPlaying(!playing);
   }
+  */
 
   /*
   useEffect(() => {

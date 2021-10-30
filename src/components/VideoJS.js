@@ -7,11 +7,14 @@ import Controls from "./Controls";
 export const VideoJS = (props) => {
   const videoRef = React.useRef(null);
   const playerRef = React.useRef(null);
+  const containerRef = React.useRef(null);
   const { onReady } = props;
+  const [ playing, setPlaying ] = useState(false);
 
   const [options, setOptions] = useState({
     // lookup the options in the docs for more options
     autoplay: true,
+    mute: true,
     controls: false,
     responsive: true,
     fluid: true,
@@ -22,7 +25,6 @@ export const VideoJS = (props) => {
       },
     ],
   });
-  const [refresh, setRefresh] = useState(false);
 
   React.useEffect(() => {
     // make sure Video.js player is only initialized once
@@ -53,11 +55,23 @@ export const VideoJS = (props) => {
     };
   }, []);
 
+  const handlePlay = () => {
+    const player = playerRef.current;
+
+    if(playing){
+      player.pause();
+    }
+    else {
+      player.play();
+    }
+    setPlaying(!playing);
+  }
+
   return (
     <>
-      <div data-vjs-player>
-        <video ref={videoRef} className="video-js vjs-big-play-centered" />
-        <Controls playerRef={playerRef} />
+      <div data-vjs-player ref={containerRef}>
+        <video ref={videoRef} className="video-js vjs-big-play-centered" onClick={handlePlay} />
+        <Controls playerRef={playerRef} playing={playing} handlePlay={handlePlay} />
       </div>
       <button
         onClick={() => {
