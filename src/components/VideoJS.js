@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { Slider } from "@mui/material";
+import { Fade } from "@mui/material";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
+import "videojs-contrib-quality-levels";
 import Controls from "./Controls";
 
 export const VideoJS = (props) => {
@@ -9,19 +10,20 @@ export const VideoJS = (props) => {
   const playerRef = React.useRef(null);
   const containerRef = React.useRef(null);
   const { onReady } = props;
-  const [ playing, setPlaying ] = useState(false);
+  const [ playing, setPlaying ] = useState(true);
+  const [ hovered, setHovered ] = useState(false);
 
   const [options, setOptions] = useState({
     // lookup the options in the docs for more options
     autoplay: true,
-    mute: true,
+    mute: false,
     controls: false,
     responsive: true,
     fluid: true,
     sources: [
       {
-        src: "https://s3.amazonaws.com/_bc_dml/example-content/sintel_dash/sintel_vod.mpd",
-        type: "application/dash+xml",
+        src: "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
+        type: "application/x-mpegURL",
       },
     ],
   });
@@ -65,24 +67,24 @@ export const VideoJS = (props) => {
       player.play();
     }
     setPlaying(!playing);
+
+    console.log(player.qualityLevels());
+  }
+
+  const handleHoverEnter = () => {
+    setHovered(true);
+  }
+
+  const handleHoverLeave = () => {
+    setHovered(false);
   }
 
   return (
     <>
-      <div data-vjs-player ref={containerRef}>
+      <div data-vjs-player ref={containerRef} onMouseOver={handleHoverEnter} onMouseLeave={handleHoverLeave} onClick={handleHoverEnter}>
         <video ref={videoRef} className="video-js vjs-big-play-centered" onClick={handlePlay} />
         <Controls playerRef={playerRef} playing={playing} handlePlay={handlePlay} />
       </div>
-      <button
-        onClick={() => {
-          const player = playerRef.current;
-          // player.autoplay(options.autoplay);
-          // player.src(options.sources);
-          player.controls(false);
-        }}
-      >
-        Hide controls
-      </button>
     </>
   );
 };

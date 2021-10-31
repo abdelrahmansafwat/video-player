@@ -19,22 +19,34 @@ import {
   VolumeOff,
   Fullscreen,
   FullscreenExit,
+  Hd
 } from "@mui/icons-material";
 
 const Controls = (props) => {
-  const [ started, setStarted ] = useState(false);
+  const [started, setStarted] = useState(false);
   //const [ playing, setPlaying ] = useState(false);
-  const [ fullscreen, setFullscreen ] = useState(false);
-  const [ time, setTime ] = useState(0);
-  const [ volume, setVolume ] = useState(100);
-  const [ oldVolume, setOldVolume ] = useState(100);
-  const [ mute, setMute ] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [time, setTime] = useState(0);
+  const [volume, setVolume] = useState(100);
+  const [oldVolume, setOldVolume] = useState(100);
+  const [mute, setMute] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const { playerRef, playing, handlePlay } = props;
+
+  const open = Boolean(anchorEl);
+
+  const handleOpenVolume = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseVolume = () => {
+    setAnchorEl(null);
+  };
 
   const getSeconds = () => {
     const player = playerRef.current;
 
-    let currentTime = (player.currentTime()/player.duration()) * 100;
+    let currentTime = (player.currentTime() / player.duration()) * 100;
 
     setTime(currentTime);
   }
@@ -42,7 +54,7 @@ const Controls = (props) => {
   const autoPlay = () => {
     const player = playerRef.current;
 
-    if(player && player.readyState() > 0){
+    if (player && player.readyState() > 0) {
       console.log(player.readyState());
 
       //player.volume(100);
@@ -50,7 +62,7 @@ const Controls = (props) => {
     }
   }
 
-  if(!started){
+  if (!started) {
     autoPlay();
   }
 
@@ -64,7 +76,7 @@ const Controls = (props) => {
   const handleFullscreen = () => {
     const player = playerRef.current;
 
-    if(fullscreen){
+    if (fullscreen) {
       player.exitFullscreen();
     }
     else {
@@ -98,7 +110,7 @@ const Controls = (props) => {
   const handleSeek = (event, newValue) => {
     const player = playerRef.current;
 
-    let timeSeeked = parseInt(player.duration() * (newValue/100));
+    let timeSeeked = parseInt(player.duration() * (newValue / 100));
 
     //(player.currentTime()/player.duration()) * 100;
 
@@ -110,8 +122,8 @@ const Controls = (props) => {
   const handleMute = () => {
     const player = playerRef.current;
 
-    if(mute){
-      player.volume(oldVolume/100);
+    if (mute) {
+      player.volume(oldVolume / 100);
       setVolume(oldVolume);
     }
     else {
@@ -126,9 +138,17 @@ const Controls = (props) => {
   const handleChangeVolume = (event, newValue) => {
     const player = playerRef.current;
 
-    player.volume(newValue/100);
+    player.volume(newValue / 100);
 
     setVolume(newValue);
+  }
+
+  const handleQualityChange = (selectedQuality) => {
+      
+  }
+
+  const handleQualityToggle = () => {
+    setChangeQuality(!changeQuality);
   }
 
   return (
@@ -157,13 +177,32 @@ const Controls = (props) => {
             {!playing && <PlayArrow />}
             {playing && <Pause />}
           </IconButton>
-          <IconButton onClick={handleMute}>
+          <IconButton onClick={handleMute} onMouseOver={handleOpenVolume} >
             {(mute || volume === 0) && <VolumeOff />}
             {!mute && volume >= 66 && <VolumeUp />}
             {!mute && volume >= 33 && volume < 66 && <VolumeDown />}
             {!mute && volume < 33 && volume > 0 && <VolumeMute />}
           </IconButton>
-          <Slider min={0} max={100} value={volume} onChange={handleChangeVolume} />
+          <Popover
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleCloseVolume}
+            anchorOrigin={{
+              vertical: -150,
+              horizontal: -20,
+            }}
+            PaperProps={{
+              style: {
+                backgroundColor: 'transparent',
+                boxShadow: 'none',
+              },
+            }}
+            sx={{ backgroundColor: "transparent", }}
+          >
+            <Box sx={{ width: 30, height: 100, padding: 3, background: "rgba(0,0,0,0.6)", }} onMouseLeave={handleCloseVolume}>
+              <Slider orientation="vertical" min={0} max={100} value={volume} onChange={handleChangeVolume} />
+            </Box>
+          </Popover>
         </Grid>
         <Grid item xs={9}>
           <Slider min={0} max={100} value={time} onChange={handleSeek} />
