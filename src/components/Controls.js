@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Slider,
   Box,
@@ -7,6 +7,10 @@ import {
   Button,
   Popover,
   Collapse,
+  Tooltip,
+  List,
+  ListItem,
+  ListItemButton,
 } from "@mui/material";
 import {
   Pause,
@@ -19,7 +23,7 @@ import {
   VolumeOff,
   Fullscreen,
   FullscreenExit,
-  Hd
+  Hd,
 } from "@mui/icons-material";
 
 const Controls = (props) => {
@@ -27,21 +31,13 @@ const Controls = (props) => {
   //const [ playing, setPlaying ] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [time, setTime] = useState(0);
-  const [volume, setVolume] = useState(100);
-  const [oldVolume, setOldVolume] = useState(100);
+  const [volume, setVolume] = useState(0);
+  const [oldVolume, setOldVolume] = useState(0);
   const [mute, setMute] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [changeQuality, setChangeQuality] = useState(false);
+  const [refresh, setRefresh] = useState(false);
+  const [resolutions, setResolutions] = useState([]);
   const { playerRef, playing, handlePlay } = props;
-
-  const open = Boolean(anchorEl);
-
-  const handleOpenVolume = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseVolume = () => {
-    setAnchorEl(null);
-  };
 
   const getSeconds = () => {
     const player = playerRef.current;
@@ -49,18 +45,29 @@ const Controls = (props) => {
     let currentTime = (player.currentTime() / player.duration()) * 100;
 
     setTime(currentTime);
-  }
+  };
 
   const autoPlay = () => {
     const player = playerRef.current;
 
     if (player && player.readyState() > 0) {
       console.log(player.readyState());
+      console.log(player.qualityLevels());
+
+      let resolutionsTemp = [...resolutions];
+
+      player.qualityLevels().levels_.map((value) => {
+        resolutionsTemp.push(value.width);
+      });
+
+      resolutionsTemp.reverse();
+
+      setResolutions(resolutions);
 
       //player.volume(100);
       setStarted(true);
     }
-  }
+  };
 
   if (!started) {
     autoPlay();
@@ -78,12 +85,11 @@ const Controls = (props) => {
 
     if (fullscreen) {
       player.exitFullscreen();
-    }
-    else {
+    } else {
       player.requestFullscreen();
     }
     setFullscreen(!fullscreen);
-  }
+  };
 
   /*
   const handlePlay = () => {
@@ -117,23 +123,27 @@ const Controls = (props) => {
     setTime(newValue);
 
     player.currentTime(timeSeeked);
-  }
+  };
 
   const handleMute = () => {
     const player = playerRef.current;
 
     if (mute) {
-      player.volume(oldVolume / 100);
-      setVolume(oldVolume);
-    }
-    else {
+      if (oldVolume === 0) {
+        player.volume(100);
+        setVolume(100);
+      } else {
+        player.volume(oldVolume / 100);
+        setVolume(oldVolume);
+      }
+    } else {
       player.volume(0);
       setOldVolume(volume);
       setVolume(0);
     }
 
     setMute(!mute);
-  }
+  };
 
   const handleChangeVolume = (event, newValue) => {
     const player = playerRef.current;
@@ -141,15 +151,15 @@ const Controls = (props) => {
     player.volume(newValue / 100);
 
     setVolume(newValue);
-  }
+    setMute(false);
+  };
 
-  const handleQualityChange = (selectedQuality) => {
-      
-  }
+  const handleQualityChange = (selectedQuality) => {};
 
   const handleQualityToggle = () => {
     setChangeQuality(!changeQuality);
-  }
+    console.log(document.body.children.root.children.vjs_video_3);
+  };
 
   return (
     <Box
@@ -177,37 +187,68 @@ const Controls = (props) => {
             {!playing && <PlayArrow />}
             {playing && <Pause />}
           </IconButton>
-          <IconButton onClick={handleMute} onMouseOver={handleOpenVolume} >
-            {(mute || volume === 0) && <VolumeOff />}
-            {!mute && volume >= 66 && <VolumeUp />}
-            {!mute && volume >= 33 && volume < 66 && <VolumeDown />}
-            {!mute && volume < 33 && volume > 0 && <VolumeMute />}
-          </IconButton>
-          <Popover
-            open={open}
-            anchorEl={anchorEl}
-            onClose={handleCloseVolume}
-            anchorOrigin={{
-              vertical: -150,
-              horizontal: -20,
+          <Tooltip
+            PopperProps={{
+              container: document.body.children.root.children.vjs_video_3,
             }}
-            PaperProps={{
-              style: {
-                backgroundColor: 'transparent',
-                boxShadow: 'none',
-              },
-            }}
-            sx={{ backgroundColor: "transparent", }}
+            title={
+              <Box
+                sx={{
+                  //width: 30,
+                  height: 100,
+                  padding: 1,
+                  background: "rgba(0,0,0,0)",
+                }}
+              >
+                <Slider
+                  orientation="vertical"
+                  min={0}
+                  max={100}
+                  value={volume}
+                  onChange={handleChangeVolume}
+                />
+              </Box>
+            }
           >
-            <Box sx={{ width: 30, height: 100, padding: 3, background: "rgba(0,0,0,0.6)", }} onMouseLeave={handleCloseVolume}>
-              <Slider orientation="vertical" min={0} max={100} value={volume} onChange={handleChangeVolume} />
-            </Box>
-          </Popover>
+            <IconButton onClick={handleMute}>
+              {(mute || volume === 0) && <VolumeOff />}
+              {!mute && volume >= 66 && <VolumeUp />}
+              {!mute && volume >= 33 && volume < 66 && <VolumeDown />}
+              {!mute && volume < 33 && volume > 0 && <VolumeMute />}
+            </IconButton>
+          </Tooltip>
         </Grid>
         <Grid item xs={9}>
           <Slider min={0} max={100} value={time} onChange={handleSeek} />
         </Grid>
         <Grid item>
+          <Tooltip
+            PopperProps={{
+              container: document.body.children.root.children.vjs_video_3,
+            }}
+            title={
+              <List>
+                {resolutions.map((value, index) => {
+                  return (
+                    <ListItem
+                      disablePadding
+                      sx={{ backgroundColor: "rgba(120, 120, 120, 1)" }}
+                    >
+                      <ListItemButton>720p</ListItemButton>
+                    </ListItem>
+                  );
+                })}
+              </List>
+            }
+            open={changeQuality}
+            disableFocusListener
+            disableHoverListener
+            disableTouchListener
+          >
+            <IconButton onClick={handleQualityToggle}>
+              <Hd />
+            </IconButton>
+          </Tooltip>
           <IconButton onClick={handleFullscreen}>
             {!fullscreen && <Fullscreen />}
             {fullscreen && <FullscreenExit />}

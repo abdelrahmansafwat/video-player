@@ -16,7 +16,7 @@ export const VideoJS = (props) => {
   const [options, setOptions] = useState({
     // lookup the options in the docs for more options
     autoplay: true,
-    mute: false,
+    mute: true,
     controls: false,
     responsive: true,
     fluid: true,
@@ -81,7 +81,7 @@ export const VideoJS = (props) => {
 
   return (
     <>
-      <div data-vjs-player ref={containerRef} onMouseOver={handleHoverEnter} onMouseLeave={handleHoverLeave} onClick={handleHoverEnter}>
+      <div id={"videojsContainer"} data-vjs-player ref={containerRef} onMouseOver={handleHoverEnter} onMouseLeave={handleHoverLeave} onClick={handleHoverEnter}>
         <video ref={videoRef} className="video-js vjs-big-play-centered" onClick={handlePlay} />
         <Controls playerRef={playerRef} playing={playing} handlePlay={handlePlay} />
       </div>
