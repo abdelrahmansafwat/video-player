@@ -37,6 +37,7 @@ const Controls = (props) => {
   const [changeQuality, setChangeQuality] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [resolutions, setResolutions] = useState([]);
+  const [resolution, setResolution] = useState();
   const { playerRef, playing, handlePlay } = props;
 
   const getSeconds = () => {
@@ -62,7 +63,9 @@ const Controls = (props) => {
 
       resolutionsTemp.reverse();
 
-      setResolutions(resolutions);
+      setResolutions(resolutionsTemp);
+      setResolution(player.qualityLevels().levels_[player.qualityLevels().selectedIndex_].width);
+      setRefresh(!refresh);
 
       //player.volume(100);
       setStarted(true);
@@ -154,7 +157,23 @@ const Controls = (props) => {
     setMute(false);
   };
 
-  const handleQualityChange = (selectedQuality) => {};
+  const handleQualityChange = (selectedQuality) => {
+    setResolution(selectedQuality);
+
+    const player = playerRef.current;
+
+    player.qualityLevels().levels_.map((value, index) => {
+      if (value.width == selectedQuality) {
+        player.qualityLevels().selectedIndex_ = index;
+        player.qualityLevels()[index].enabled = true;
+        player.qualityLevels().trigger({ type: 'change', selectedIndex: index });
+        console.log(player.qualityLevels().selectedIndex_);
+      }
+      else {
+        player.qualityLevels()[index].enabled = false;
+      }
+    });
+  };
 
   const handleQualityToggle = () => {
     setChangeQuality(!changeQuality);
@@ -228,16 +247,16 @@ const Controls = (props) => {
             }}
             title={
               <List>
-                {resolutions.map((value, index) => {
-                  return (
-                    <ListItem
-                      disablePadding
-                      sx={{ backgroundColor: "rgba(120, 120, 120, 1)" }}
-                    >
-                      <ListItemButton>720p</ListItemButton>
-                    </ListItem>
-                  );
-                })}
+                {resolutions?.map((value, index) =>
+
+                  <ListItem
+                    disablePadding
+                    sx={resolution == value ? { backgroundColor: "rgba(120, 120, 120, 1)" } : {}}
+                  >
+                    <ListItemButton onClick={() => handleQualityChange(value)}>{value + "p"}</ListItemButton>
+                  </ListItem>
+
+                )}
               </List>
             }
             open={changeQuality}
