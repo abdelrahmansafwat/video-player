@@ -36,6 +36,8 @@ export const VideoJS = (props) => {
 
       const player = (playerRef.current = videojs(videoElement, options, () => {
         console.log("player is ready");
+        console.log(navigator.userAgent);
+        
         onReady && onReady(player);
       }));
     } else {

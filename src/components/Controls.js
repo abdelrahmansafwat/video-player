@@ -26,6 +26,8 @@ import {
   Hd,
 } from "@mui/icons-material";
 
+//#901235
+
 const Controls = (props) => {
   const [started, setStarted] = useState(false);
   //const [ playing, setPlaying ] = useState(false);
@@ -90,6 +92,7 @@ const Controls = (props) => {
       player.exitFullscreen();
     } else {
       player.requestFullscreen();
+      window.screen.orientation.lock('landscape');
     }
     setFullscreen(!fullscreen);
   };
@@ -210,13 +213,21 @@ const Controls = (props) => {
             PopperProps={{
               container: document.body.children.root.children.vjs_video_3,
             }}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: "transparent",
+                }
+              }
+            }}
             title={
               <Box
                 sx={{
                   //width: 30,
                   height: 100,
-                  padding: 1,
-                  background: "rgba(0,0,0,0)",
+                  padding: 2,
+                  background: "rgba(0,0,0,0.6)",
+                  borderRadius: 1
                 }}
               >
                 <Slider
@@ -225,6 +236,29 @@ const Controls = (props) => {
                   max={100}
                   value={volume}
                   onChange={handleChangeVolume}
+                  sx={{
+                    color: '#901235',
+                    '& .MuiSlider-thumb': {
+                      width: 8,
+                      height: 8,
+                      transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+                      '&:before': {
+                        boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)',
+                      },
+                      '&:hover, &.Mui-focusVisible': {
+                        boxShadow: `0px 0px 0px 8px ${'rgb(255 255 255 / 16%)'
+        
+                          }`,
+                      },
+                      '&.Mui-active': {
+                        width: 20,
+                        height: 20,
+                      },
+                    },
+                    '& .MuiSlider-rail': {
+                      opacity: 0.28,
+                    },
+                  }}
                 />
               </Box>
             }
@@ -238,20 +272,56 @@ const Controls = (props) => {
           </Tooltip>
         </Grid>
         <Grid item xs={9}>
-          <Slider min={0} max={100} value={time} onChange={handleSeek} />
+          <Slider min={0} max={100} value={time} onChange={handleSeek} sx={{
+            color: '#901235',
+            height: 4,
+            '& .MuiSlider-thumb': {
+              width: 8,
+              height: 8,
+              transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
+              '&:before': {
+                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)',
+              },
+              '&:hover, &.Mui-focusVisible': {
+                boxShadow: `0px 0px 0px 8px ${'rgb(255 255 255 / 16%)'
+
+                  }`,
+              },
+              '&.Mui-active': {
+                width: 20,
+                height: 20,
+              },
+            },
+            '& .MuiSlider-rail': {
+              opacity: 0.28,
+            },
+          }} />
         </Grid>
         <Grid item>
           <Tooltip
             PopperProps={{
               container: document.body.children.root.children.vjs_video_3,
             }}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: "transparent",
+                }
+              }
+            }}
             title={
-              <List>
+              <List sx={{
+                //width: 30,
+                //height: 100,
+                padding: 2,
+                background: "rgba(0,0,0,0.6)",
+                borderRadius: 1
+              }}>
                 {resolutions?.map((value, index) =>
 
                   <ListItem
                     disablePadding
-                    sx={resolution == value ? { backgroundColor: "rgba(120, 120, 120, 1)" } : {}}
+                    sx={resolution == value ? { backgroundColor: "#901235" } : {}}
                   >
                     <ListItemButton onClick={() => handleQualityChange(value)}>{value + "p"}</ListItemButton>
                   </ListItem>
