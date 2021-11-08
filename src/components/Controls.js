@@ -11,19 +11,22 @@ import {
   List,
   ListItem,
   ListItemButton,
+  Typography,
 } from "@mui/material";
 import {
   Pause,
   PlayArrow,
   Replay10,
   Forward10,
-  VolumeUp,
-  VolumeDown,
-  VolumeMute,
-  VolumeOff,
+  VolumeUpOutlined as VolumeUp,
+  VolumeDownOutlined as VolumeDown,
+  VolumeMuteOutlined as VolumeMute,
+  VolumeOffOutlined as VolumeOff,
   Fullscreen,
   FullscreenExit,
   Hd,
+  SettingsOutlined as Settings,
+  FilterNone
 } from "@mui/icons-material";
 
 //#901235
@@ -33,14 +36,33 @@ const Controls = (props) => {
   //const [ playing, setPlaying ] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [time, setTime] = useState(0);
-  const [volume, setVolume] = useState(0);
-  const [oldVolume, setOldVolume] = useState(0);
+  const [volume, setVolume] = useState(100);
+  const [oldVolume, setOldVolume] = useState(100);
   const [mute, setMute] = useState(false);
   const [changeQuality, setChangeQuality] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [resolutions, setResolutions] = useState([]);
   const [resolution, setResolution] = useState();
+  const [duration, setDuration] = useState("0:00");
+  const [convertedTime, setConvertedTime] = useState("0:00");
   const { playerRef, playing, handlePlay } = props;
+
+  const convertTime = (duration) => {
+    let hrs = Math.floor(duration / 3600);
+    let mins = Math.floor((duration % 3600) / 60);
+    let secs = Math.floor(duration % 60);
+
+    // Output like "1:01" or "4:03:59" or "123:03:59"
+    let ret = "";
+
+    if (hrs > 0) {
+      ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+    }
+
+    ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+    ret += "" + secs;
+    return ret;
+  };
 
   const getSeconds = () => {
     const player = playerRef.current;
@@ -48,6 +70,7 @@ const Controls = (props) => {
     let currentTime = (player.currentTime() / player.duration()) * 100;
 
     setTime(currentTime);
+    setConvertedTime(convertTime(player.currentTime()));
   };
 
   const autoPlay = () => {
@@ -66,7 +89,11 @@ const Controls = (props) => {
       resolutionsTemp.reverse();
 
       setResolutions(resolutionsTemp);
-      setResolution(player.qualityLevels().levels_[player.qualityLevels().selectedIndex_].width);
+      setResolution(
+        player.qualityLevels().levels_[player.qualityLevels().selectedIndex_]
+          .width
+      );
+      setDuration(convertTime(player.duration()));
       setRefresh(!refresh);
 
       //player.volume(100);
@@ -92,7 +119,10 @@ const Controls = (props) => {
       player.exitFullscreen();
     } else {
       player.requestFullscreen();
-      window.screen.orientation.lock('landscape');
+
+      window.screen.orientation.lock("landscape").catch((err) => {
+        console.log("Landscape not supported");
+      });;
     }
     setFullscreen(!fullscreen);
   };
@@ -129,6 +159,7 @@ const Controls = (props) => {
     setTime(newValue);
 
     player.currentTime(timeSeeked);
+    //setConvertedTime(convertedTime(timeSeeked));
   };
 
   const handleMute = () => {
@@ -169,10 +200,11 @@ const Controls = (props) => {
       if (value.width == selectedQuality) {
         player.qualityLevels().selectedIndex_ = index;
         player.qualityLevels()[index].enabled = true;
-        player.qualityLevels().trigger({ type: 'change', selectedIndex: index });
+        player
+          .qualityLevels()
+          .trigger({ type: "change", selectedIndex: index });
         console.log(player.qualityLevels().selectedIndex_);
-      }
-      else {
+      } else {
         player.qualityLevels()[index].enabled = false;
       }
     });
@@ -181,6 +213,20 @@ const Controls = (props) => {
   const handleQualityToggle = () => {
     setChangeQuality(!changeQuality);
     console.log(document.body.children.root.children.vjs_video_3);
+  };
+
+  const handleReplay = () => {
+    const player = playerRef.current;
+
+    player.currentTime(player.currentTime() - 10);
+    setConvertedTime(convertTime(player.currentTime() - 10));
+  };
+
+  const handleForward = () => {
+    const player = playerRef.current;
+
+    player.currentTime(player.currentTime() + 10);
+    setConvertedTime(convertTime(player.currentTime() + 10));
   };
 
   return (
@@ -209,6 +255,55 @@ const Controls = (props) => {
             {!playing && <PlayArrow />}
             {playing && <Pause />}
           </IconButton>
+
+          <IconButton onClick={handleReplay}>
+            <Replay10 />
+          </IconButton>
+
+          <IconButton onClick={handleForward}>
+            <Forward10 />
+          </IconButton>
+        </Grid>
+        <Grid item xs={9}>
+          <Grid container>
+            <Grid item xs={11}>
+              <Slider
+                min={0}
+                max={100}
+                value={time}
+                onChange={handleSeek}
+                sx={{
+                  color: "#901235",
+                  height: 4,
+                  "& .MuiSlider-thumb": {
+                    width: 8,
+                    height: 8,
+                    transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
+                    "&:before": {
+                      boxShadow: "0 2px 12px 0 rgba(0,0,0,0.4)",
+                    },
+                    "&:hover, &.Mui-focusVisible": {
+                      boxShadow: `0px 0px 0px 8px ${"rgb(255 255 255 / 16%)"}`,
+                    },
+                    "&.Mui-active": {
+                      width: 20,
+                      height: 20,
+                    },
+                  },
+                  "& .MuiSlider-rail": {
+                    opacity: 0.28,
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item sx={{ marginTop: 0.5, marginLeft: 2 }}>
+              <Typography variant="caption" align="center">
+                {convertedTime} / {duration}
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid item>
           <Tooltip
             PopperProps={{
               container: document.body.children.root.children.vjs_video_3,
@@ -217,8 +312,52 @@ const Controls = (props) => {
               tooltip: {
                 sx: {
                   backgroundColor: "transparent",
-                }
-              }
+                },
+              },
+            }}
+            title={
+              <List
+                sx={{
+                  //width: 30,
+                  //height: 100,
+                  padding: 2,
+                  background: "rgba(0,0,0,0.6)",
+                  borderRadius: 1,
+                }}
+              >
+                {resolutions?.map((value, index) => (
+                  <ListItem
+                    disablePadding
+                    sx={
+                      resolution == value ? { backgroundColor: "#901235" } : {}
+                    }
+                  >
+                    <ListItemButton onClick={() => handleQualityChange(value)}>
+                      {value + "p"}
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            }
+            open={changeQuality}
+            disableFocusListener
+            disableHoverListener
+            disableTouchListener
+          >
+            <IconButton onClick={handleQualityToggle}>
+              <FilterNone sx={{ transform: "rotate(-180deg)" }} />
+            </IconButton>
+          </Tooltip>
+          <Tooltip
+            PopperProps={{
+              container: document.body.children.root.children.vjs_video_3,
+            }}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: "transparent",
+                },
+              },
             }}
             title={
               <Box
@@ -227,7 +366,7 @@ const Controls = (props) => {
                   height: 100,
                   padding: 2,
                   background: "rgba(0,0,0,0.6)",
-                  borderRadius: 1
+                  borderRadius: 1,
                 }}
               >
                 <Slider
@@ -237,25 +376,23 @@ const Controls = (props) => {
                   value={volume}
                   onChange={handleChangeVolume}
                   sx={{
-                    color: '#901235',
-                    '& .MuiSlider-thumb': {
+                    color: "#901235",
+                    "& .MuiSlider-thumb": {
                       width: 8,
                       height: 8,
-                      transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                      '&:before': {
-                        boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)',
+                      transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
+                      "&:before": {
+                        boxShadow: "0 2px 12px 0 rgba(0,0,0,0.4)",
                       },
-                      '&:hover, &.Mui-focusVisible': {
-                        boxShadow: `0px 0px 0px 8px ${'rgb(255 255 255 / 16%)'
-        
-                          }`,
+                      "&:hover, &.Mui-focusVisible": {
+                        boxShadow: `0px 0px 0px 8px ${"rgb(255 255 255 / 16%)"}`,
                       },
-                      '&.Mui-active': {
+                      "&.Mui-active": {
                         width: 20,
                         height: 20,
                       },
                     },
-                    '& .MuiSlider-rail': {
+                    "& .MuiSlider-rail": {
                       opacity: 0.28,
                     },
                   }}
@@ -270,74 +407,9 @@ const Controls = (props) => {
               {!mute && volume < 33 && volume > 0 && <VolumeMute />}
             </IconButton>
           </Tooltip>
-        </Grid>
-        <Grid item xs={9}>
-          <Slider min={0} max={100} value={time} onChange={handleSeek} sx={{
-            color: '#901235',
-            height: 4,
-            '& .MuiSlider-thumb': {
-              width: 8,
-              height: 8,
-              transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-              '&:before': {
-                boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)',
-              },
-              '&:hover, &.Mui-focusVisible': {
-                boxShadow: `0px 0px 0px 8px ${'rgb(255 255 255 / 16%)'
-
-                  }`,
-              },
-              '&.Mui-active': {
-                width: 20,
-                height: 20,
-              },
-            },
-            '& .MuiSlider-rail': {
-              opacity: 0.28,
-            },
-          }} />
-        </Grid>
-        <Grid item>
-          <Tooltip
-            PopperProps={{
-              container: document.body.children.root.children.vjs_video_3,
-            }}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "transparent",
-                }
-              }
-            }}
-            title={
-              <List sx={{
-                //width: 30,
-                //height: 100,
-                padding: 2,
-                background: "rgba(0,0,0,0.6)",
-                borderRadius: 1
-              }}>
-                {resolutions?.map((value, index) =>
-
-                  <ListItem
-                    disablePadding
-                    sx={resolution == value ? { backgroundColor: "#901235" } : {}}
-                  >
-                    <ListItemButton onClick={() => handleQualityChange(value)}>{value + "p"}</ListItemButton>
-                  </ListItem>
-
-                )}
-              </List>
-            }
-            open={changeQuality}
-            disableFocusListener
-            disableHoverListener
-            disableTouchListener
-          >
-            <IconButton onClick={handleQualityToggle}>
-              <Hd />
-            </IconButton>
-          </Tooltip>
+          <IconButton onClick={handleFullscreen}>
+            <Settings />
+          </IconButton>
           <IconButton onClick={handleFullscreen}>
             {!fullscreen && <Fullscreen />}
             {fullscreen && <FullscreenExit />}
