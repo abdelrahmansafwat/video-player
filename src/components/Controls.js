@@ -12,6 +12,7 @@ import {
   ListItem,
   ListItemButton,
   Typography,
+  ListItemText
 } from "@mui/material";
 import {
   Pause,
@@ -27,6 +28,7 @@ import {
   Hd,
   SettingsOutlined as Settings,
   FilterNone,
+  ArrowForwardIos as ArrowForward
 } from "@mui/icons-material";
 
 //#901235
@@ -40,9 +42,16 @@ const Controls = (props) => {
   const [oldVolume, setOldVolume] = useState(100);
   const [mute, setMute] = useState(false);
   const [changeQuality, setChangeQuality] = useState(false);
+  const [changeSpeed, setChangeSpeed] = useState(false);
+  const [changeSubtitles, setChangeSubtitles] = useState(false);
+  const [changeAudio, setChangeAudio] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [resolutions, setResolutions] = useState([]);
   const [resolution, setResolution] = useState();
+  const [speed, setSpeed] = useState(1);
+  const [subtitles, setSubtitles] = useState("None");
+  const [audio, setAudio] = useState("English");
+  const [settingsMenu, setSettingsMenu] = useState(false);
   const [duration, setDuration] = useState("0:00");
   const [convertedTime, setConvertedTime] = useState("0:00");
   const { playerRef, playing, handlePlay } = props;
@@ -229,6 +238,45 @@ const Controls = (props) => {
     setConvertedTime(convertTime(player.currentTime() + 10));
   };
 
+  const handleAudioChange = (selectedAudio) => { };
+
+  const handleSubtitlesChange = (slectedSubtitles) => { };
+
+  const handleSpeedChange = (selectedSpeed) => {
+    const player = playerRef.current;
+
+    player.playbackRate(selectedSpeed);
+    setSpeed(selectedSpeed);
+  };
+
+  const handleToggleSpeed = () => {
+    setChangeSpeed(true);
+    setSettingsMenu(false);
+  };
+
+  const handleToggleAudio = () => {
+    setChangeAudio(true);
+    setSettingsMenu(false);
+  };
+
+  const handleToggleSubtitles = () => {
+    setChangeSubtitles(true);
+    setSettingsMenu(false);
+  };
+
+  const handleToggleQuality = () => {
+    setChangeQuality(true);
+    setSettingsMenu(false);
+  };
+
+  const handleToggleSettingsMenu = () => {
+    setSettingsMenu(!settingsMenu);
+    setChangeAudio(false);
+    setChangeSubtitles(false);
+    setChangeSpeed(false);
+    setChangeQuality(false);
+  };
+
   return (
     <Box
       sx={{
@@ -388,7 +436,39 @@ const Controls = (props) => {
                     borderRadius: 1,
                   }}
                 >
-                  {resolutions?.map((value, index) => (
+                  {changeSubtitles && ["None"].map((value, index) => (
+                    <ListItem
+                      disablePadding
+                      sx={
+                        subtitles == value
+                          ? { backgroundColor: "#901235" }
+                          : {}
+                      }
+                    >
+                      <ListItemButton
+                        onClick={() => handleSubtitlesChange(value)}
+                      >
+                        {value}
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                  {changeAudio && ["English"].map((value, index) => (
+                    <ListItem
+                      disablePadding
+                      sx={
+                        audio == value
+                          ? { backgroundColor: "#901235" }
+                          : {}
+                      }
+                    >
+                      <ListItemButton
+                        onClick={() => handleAudioChange(value)}
+                      >
+                        {value}
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                  {changeQuality && resolutions?.map((value, index) => (
                     <ListItem
                       disablePadding
                       sx={
@@ -404,15 +484,57 @@ const Controls = (props) => {
                       </ListItemButton>
                     </ListItem>
                   ))}
+                  {changeSpeed && [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((value, index) => (
+                    <ListItem
+                      disablePadding
+                      sx={
+                        speed == value
+                          ? { backgroundColor: "#901235" }
+                          : {}
+                      }
+                    >
+                      <ListItemButton
+                        onClick={() => handleSpeedChange(value)}
+                      >
+                        {value + "x"}
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                  {settingsMenu && <>
+                    <ListItem>
+                      <ListItemButton onClick={handleToggleSubtitles}>
+                        <ListItemText primary="Subtitles/CC" />
+                        <ArrowForward />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem>
+                      <ListItemButton onClick={handleToggleAudio}>
+                        <ListItemText primary="Audio Language" />
+                        <ArrowForward />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem>
+                      <ListItemButton onClick={handleToggleQuality}>
+                        <ListItemText primary="Video Quality" />
+                        <ArrowForward />
+                      </ListItemButton>
+                    </ListItem>
+                    <ListItem>
+                      <ListItemButton onClick={handleToggleSpeed}>
+                        <ListItemText primary="Playback Speed" />
+                        <ArrowForward />
+                      </ListItemButton>
+                    </ListItem>
+                  </>}
                 </List>
               </>
             }
-            open={changeQuality}
+            open={settingsMenu || changeAudio || changeSubtitles || changeQuality || changeSpeed}
             disableFocusListener
             disableHoverListener
             disableTouchListener
           >
-            <IconButton onClick={handleQualityToggle}>
+            <IconButton onClick={handleToggleSettingsMenu}>
               <Settings />
             </IconButton>
           </Tooltip>
