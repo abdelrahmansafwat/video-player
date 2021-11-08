@@ -26,7 +26,7 @@ import {
   FullscreenExit,
   Hd,
   SettingsOutlined as Settings,
-  FilterNone
+  FilterNone,
 } from "@mui/icons-material";
 
 //#901235
@@ -122,7 +122,7 @@ const Controls = (props) => {
 
       window.screen.orientation.lock("landscape").catch((err) => {
         console.log("Landscape not supported");
-      });;
+      });
     }
     setFullscreen(!fullscreen);
   };
@@ -304,50 +304,9 @@ const Controls = (props) => {
           </Grid>
         </Grid>
         <Grid item>
-          <Tooltip
-            PopperProps={{
-              container: document.body.children.root.children.vjs_video_3,
-            }}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "transparent",
-                },
-              },
-            }}
-            title={
-              <List
-                sx={{
-                  //width: 30,
-                  //height: 100,
-                  padding: 2,
-                  background: "rgba(0,0,0,0.6)",
-                  borderRadius: 1,
-                }}
-              >
-                {resolutions?.map((value, index) => (
-                  <ListItem
-                    disablePadding
-                    sx={
-                      resolution == value ? { backgroundColor: "#901235" } : {}
-                    }
-                  >
-                    <ListItemButton onClick={() => handleQualityChange(value)}>
-                      {value + "p"}
-                    </ListItemButton>
-                  </ListItem>
-                ))}
-              </List>
-            }
-            open={changeQuality}
-            disableFocusListener
-            disableHoverListener
-            disableTouchListener
-          >
-            <IconButton onClick={handleQualityToggle}>
-              <FilterNone sx={{ transform: "rotate(-180deg)" }} />
-            </IconButton>
-          </Tooltip>
+          <IconButton onClick={handleQualityToggle}>
+            <FilterNone sx={{ transform: "rotate(-180deg)" }} />
+          </IconButton>
           <Tooltip
             PopperProps={{
               container: document.body.children.root.children.vjs_video_3,
@@ -407,9 +366,57 @@ const Controls = (props) => {
               {!mute && volume < 33 && volume > 0 && <VolumeMute />}
             </IconButton>
           </Tooltip>
-          <IconButton onClick={handleFullscreen}>
-            <Settings />
-          </IconButton>
+          <Tooltip
+            PopperProps={{
+              container: document.body.children.root.children.vjs_video_3,
+            }}
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  backgroundColor: "transparent",
+                },
+              },
+            }}
+            title={
+              <>
+                <List
+                  sx={{
+                    //width: 30,
+                    //height: 100,
+                    padding: 2,
+                    background: "rgba(0,0,0,0.6)",
+                    borderRadius: 1,
+                  }}
+                >
+                  {resolutions?.map((value, index) => (
+                    <ListItem
+                      disablePadding
+                      sx={
+                        resolution == value
+                          ? { backgroundColor: "#901235" }
+                          : {}
+                      }
+                    >
+                      <ListItemButton
+                        onClick={() => handleQualityChange(value)}
+                      >
+                        {value + "p"}
+                      </ListItemButton>
+                    </ListItem>
+                  ))}
+                </List>
+              </>
+            }
+            open={changeQuality}
+            disableFocusListener
+            disableHoverListener
+            disableTouchListener
+          >
+            <IconButton onClick={handleQualityToggle}>
+              <Settings />
+            </IconButton>
+          </Tooltip>
+
           <IconButton onClick={handleFullscreen}>
             {!fullscreen && <Fullscreen />}
             {fullscreen && <FullscreenExit />}
