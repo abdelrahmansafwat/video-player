@@ -18,6 +18,7 @@
     "video.js": "^7.15.4",
     "videojs-contrib-dash": "^5.1.0",
     "videojs-contrib-quality-levels": "^2.1.0",
+    "videojs-landscape-fullscreen": "^11.33.0",
     "web-vitals": "^1.0.1"
   },
   "scripts": {

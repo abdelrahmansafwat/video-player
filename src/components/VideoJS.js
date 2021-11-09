@@ -3,6 +3,7 @@ import { Fade } from "@mui/material";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "videojs-contrib-quality-levels";
+import "videojs-landscape-fullscreen";
 import Controls from "./Controls";
 
 export const VideoJS = (props) => {
@@ -37,6 +38,15 @@ export const VideoJS = (props) => {
       const player = (playerRef.current = videojs(videoElement, options, () => {
         console.log("player is ready");
         console.log(navigator.userAgent);
+
+        player.landscapeFullscreen({
+          fullscreen: {
+            enterOnRotate: true,
+            exitOnRotate: false,
+            alwaysInLandscapeMode: true,
+            iOS: true
+          }
+        })
         
         onReady && onReady(player);
       }));

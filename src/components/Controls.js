@@ -88,6 +88,7 @@ const Controls = (props) => {
     if (player && player.readyState() > 0) {
       console.log(player.readyState());
       console.log(player.qualityLevels());
+      player.landscapeFullscreen();
 
       let resolutionsTemp = [...resolutions];
 
