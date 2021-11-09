@@ -88,7 +88,12 @@ const Controls = (props) => {
     if (player && player.readyState() > 0) {
       console.log(player.readyState());
       console.log(player.qualityLevels());
-      player.landscapeFullscreen();
+
+      window.screen.orientation.lock("landscape").catch((err) => {
+        console.log("Landscape not supported");
+      });
+
+      //player.landscapeFullscreen();
 
       let resolutionsTemp = [...resolutions];
 
