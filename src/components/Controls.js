@@ -12,7 +12,7 @@ import {
   ListItem,
   ListItemButton,
   Typography,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
 import {
   Pause,
@@ -28,7 +28,7 @@ import {
   Hd,
   SettingsOutlined as Settings,
   FilterNone,
-  ArrowForwardIos as ArrowForward
+  ArrowForwardIos as ArrowForward,
 } from "@mui/icons-material";
 
 //#901235
@@ -238,9 +238,9 @@ const Controls = (props) => {
     setConvertedTime(convertTime(player.currentTime() + 10));
   };
 
-  const handleAudioChange = (selectedAudio) => { };
+  const handleAudioChange = (selectedAudio) => {};
 
-  const handleSubtitlesChange = (slectedSubtitles) => { };
+  const handleSubtitlesChange = (slectedSubtitles) => {};
 
   const handleSpeedChange = (selectedSpeed) => {
     const player = playerRef.current;
@@ -296,25 +296,25 @@ const Controls = (props) => {
         justifyContent="space-between"
         alignItems="center"
         //style={{ padding: 16 }}
-        spacing={3}
+        //spacing={3}
       >
-        <Grid item>
+        <Grid item xs={2}>
           <IconButton onClick={handlePlay}>
-            {!playing && <PlayArrow />}
-            {playing && <Pause />}
+            {!playing && <PlayArrow sx={{ fontSize: "1.75vw" }} />}
+            {playing && <Pause sx={{ fontSize: "1.75vw" }} />}
           </IconButton>
 
           <IconButton onClick={handleReplay}>
-            <Replay10 />
+            <Replay10 sx={{ fontSize: "1.75vw" }} />
           </IconButton>
 
           <IconButton onClick={handleForward}>
-            <Forward10 />
+            <Forward10 sx={{ fontSize: "1.75vw" }} />
           </IconButton>
         </Grid>
-        <Grid item xs={9}>
+        <Grid item xs={8}>
           <Grid container>
-            <Grid item xs={11}>
+            <Grid item xs={10}>
               <Slider
                 min={0}
                 max={100}
@@ -344,205 +344,227 @@ const Controls = (props) => {
                 }}
               />
             </Grid>
-            <Grid item sx={{ marginTop: 0.5, marginLeft: 2 }}>
-              <Typography variant="caption" align="center">
+            <Grid item sx={{ marginTop: 1, marginLeft: 2 }}>
+              <Box sx={{ fontSize: "1vw" }}>
                 {convertedTime} / {duration}
-              </Typography>
+              </Box>
             </Grid>
           </Grid>
         </Grid>
-        <Grid item>
-          <IconButton onClick={handleQualityToggle}>
-            <FilterNone sx={{ transform: "rotate(-180deg)" }} />
-          </IconButton>
-          <Tooltip
-            PopperProps={{
-              container: document.body.children.root.children.vjs_video_3,
-            }}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "transparent",
-                },
-              },
-            }}
-            title={
-              <Box
-                sx={{
-                  //width: 30,
-                  height: 100,
-                  padding: 2,
-                  background: "rgba(0,0,0,0.6)",
-                  borderRadius: 1,
-                }}
-              >
-                <Slider
-                  orientation="vertical"
-                  min={0}
-                  max={100}
-                  value={volume}
-                  onChange={handleChangeVolume}
-                  sx={{
-                    color: "#901235",
-                    "& .MuiSlider-thumb": {
-                      width: 8,
-                      height: 8,
-                      transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
-                      "&:before": {
-                        boxShadow: "0 2px 12px 0 rgba(0,0,0,0.4)",
-                      },
-                      "&:hover, &.Mui-focusVisible": {
-                        boxShadow: `0px 0px 0px 8px ${"rgb(255 255 255 / 16%)"}`,
-                      },
-                      "&.Mui-active": {
-                        width: 20,
-                        height: 20,
-                      },
-                    },
-                    "& .MuiSlider-rail": {
-                      opacity: 0.28,
-                    },
-                  }}
-                />
-              </Box>
-            }
-          >
-            <IconButton onClick={handleMute}>
-              {(mute || volume === 0) && <VolumeOff />}
-              {!mute && volume >= 66 && <VolumeUp />}
-              {!mute && volume >= 33 && volume < 66 && <VolumeDown />}
-              {!mute && volume < 33 && volume > 0 && <VolumeMute />}
+        <Grid item xs={2} justifyContent="flex-end" alignContent="flex-end">
+          <Grid container justifyContent="flex-end" alignContent="flex-end">
+            <IconButton onClick={handleQualityToggle}>
+              <FilterNone
+                sx={{ transform: "rotate(-180deg)", fontSize: "1.75vw" }}
+              />
             </IconButton>
-          </Tooltip>
-          <Tooltip
-            PopperProps={{
-              container: document.body.children.root.children.vjs_video_3,
-            }}
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  backgroundColor: "transparent",
+            <Tooltip
+              PopperProps={{
+                container: document.body.children.root.children.vjs_video_3,
+              }}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: "transparent",
+                  },
                 },
-              },
-            }}
-            title={
-              <>
-                <List
+              }}
+              title={
+                <Box
                   sx={{
                     //width: 30,
-                    //height: 100,
+                    height: 100,
                     padding: 2,
                     background: "rgba(0,0,0,0.6)",
                     borderRadius: 1,
                   }}
                 >
-                  {changeSubtitles && ["None"].map((value, index) => (
-                    <ListItem
-                      disablePadding
-                      sx={
-                        subtitles == value
-                          ? { backgroundColor: "#901235" }
-                          : {}
-                      }
-                    >
-                      <ListItemButton
-                        onClick={() => handleSubtitlesChange(value)}
-                      >
-                        {value}
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                  {changeAudio && ["English"].map((value, index) => (
-                    <ListItem
-                      disablePadding
-                      sx={
-                        audio == value
-                          ? { backgroundColor: "#901235" }
-                          : {}
-                      }
-                    >
-                      <ListItemButton
-                        onClick={() => handleAudioChange(value)}
-                      >
-                        {value}
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                  {changeQuality && resolutions?.map((value, index) => (
-                    <ListItem
-                      disablePadding
-                      sx={
-                        resolution == value
-                          ? { backgroundColor: "#901235" }
-                          : {}
-                      }
-                    >
-                      <ListItemButton
-                        onClick={() => handleQualityChange(value)}
-                      >
-                        {value + "p"}
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                  {changeSpeed && [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map((value, index) => (
-                    <ListItem
-                      disablePadding
-                      sx={
-                        speed == value
-                          ? { backgroundColor: "#901235" }
-                          : {}
-                      }
-                    >
-                      <ListItemButton
-                        onClick={() => handleSpeedChange(value)}
-                      >
-                        {value + "x"}
-                      </ListItemButton>
-                    </ListItem>
-                  ))}
-                  {settingsMenu && <>
-                    <ListItem>
-                      <ListItemButton onClick={handleToggleSubtitles}>
-                        <ListItemText primary="Subtitles/CC" />
-                        <ArrowForward />
-                      </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemButton onClick={handleToggleAudio}>
-                        <ListItemText primary="Audio Language" />
-                        <ArrowForward />
-                      </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemButton onClick={handleToggleQuality}>
-                        <ListItemText primary="Video Quality" />
-                        <ArrowForward />
-                      </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                      <ListItemButton onClick={handleToggleSpeed}>
-                        <ListItemText primary="Playback Speed" />
-                        <ArrowForward />
-                      </ListItemButton>
-                    </ListItem>
-                  </>}
-                </List>
-              </>
-            }
-            open={settingsMenu || changeAudio || changeSubtitles || changeQuality || changeSpeed}
-            disableFocusListener
-            disableHoverListener
-            disableTouchListener
-          >
-            <IconButton onClick={handleToggleSettingsMenu}>
-              <Settings />
-            </IconButton>
-          </Tooltip>
+                  <Slider
+                    orientation="vertical"
+                    min={0}
+                    max={100}
+                    value={volume}
+                    onChange={handleChangeVolume}
+                    sx={{
+                      color: "#901235",
+                      "& .MuiSlider-thumb": {
+                        width: 8,
+                        height: 8,
+                        transition: "0.3s cubic-bezier(.47,1.64,.41,.8)",
+                        "&:before": {
+                          boxShadow: "0 2px 12px 0 rgba(0,0,0,0.4)",
+                        },
+                        "&:hover, &.Mui-focusVisible": {
+                          boxShadow: `0px 0px 0px 8px ${"rgb(255 255 255 / 16%)"}`,
+                        },
+                        "&.Mui-active": {
+                          width: 20,
+                          height: 20,
+                        },
+                      },
+                      "& .MuiSlider-rail": {
+                        opacity: 0.28,
+                      },
+                    }}
+                  />
+                </Box>
+              }
+            >
+              <IconButton onClick={handleMute}>
+                {(mute || volume === 0) && (
+                  <VolumeOff sx={{ fontSize: "1.75vw" }} />
+                )}
+                {!mute && volume >= 66 && <VolumeUp sx={{ fontSize: "1.75vw" }} />}
+                {!mute && volume >= 33 && volume < 66 && (
+                  <VolumeDown sx={{ fontSize: "1.75vw" }} />
+                )}
+                {!mute && volume < 33 && volume > 0 && (
+                  <VolumeMute sx={{ fontSize: "1.75vw" }} />
+                )}
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              PopperProps={{
+                container: document.body.children.root.children.vjs_video_3,
+              }}
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    backgroundColor: "transparent",
+                  },
+                },
+              }}
+              title={
+                <>
+                  <List
+                    sx={{
+                      //width: 30,
+                      //height: 100,
+                      padding: 2,
+                      background: "rgba(0,0,0,0.6)",
+                      borderRadius: 1,
+                    }}
+                  >
+                    {changeSubtitles &&
+                      ["None"].map((value, index) => (
+                        <ListItem
+                          disablePadding
+                          sx={
+                            subtitles == value
+                              ? { backgroundColor: "#901235" }
+                              : {}
+                          }
+                        >
+                          <ListItemButton
+                            onClick={() => handleSubtitlesChange(value)}
+                          >
+                            {value}
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
+                    {changeAudio &&
+                      ["English"].map((value, index) => (
+                        <ListItem
+                          disablePadding
+                          sx={
+                            audio == value ? { backgroundColor: "#901235" } : {}
+                          }
+                        >
+                          <ListItemButton
+                            onClick={() => handleAudioChange(value)}
+                          >
+                            {value}
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
+                    {changeQuality &&
+                      resolutions?.map((value, index) => (
+                        <ListItem
+                          disablePadding
+                          sx={
+                            resolution == value
+                              ? { backgroundColor: "#901235" }
+                              : {}
+                          }
+                        >
+                          <ListItemButton
+                            onClick={() => handleQualityChange(value)}
+                          >
+                            {value + "p"}
+                          </ListItemButton>
+                        </ListItem>
+                      ))}
+                    {changeSpeed &&
+                      [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(
+                        (value, index) => (
+                          <ListItem
+                            disablePadding
+                            sx={
+                              speed == value
+                                ? { backgroundColor: "#901235" }
+                                : {}
+                            }
+                          >
+                            <ListItemButton
+                              onClick={() => handleSpeedChange(value)}
+                            >
+                              {value + "x"}
+                            </ListItemButton>
+                          </ListItem>
+                        )
+                      )}
+                    {settingsMenu && (
+                      <>
+                        <ListItem>
+                          <ListItemButton onClick={handleToggleSubtitles}>
+                            <ListItemText primary="Subtitles/CC" />
+                            <ArrowForward />
+                          </ListItemButton>
+                        </ListItem>
+                        <ListItem>
+                          <ListItemButton onClick={handleToggleAudio}>
+                            <ListItemText primary="Audio Language" />
+                            <ArrowForward />
+                          </ListItemButton>
+                        </ListItem>
+                        <ListItem>
+                          <ListItemButton onClick={handleToggleQuality}>
+                            <ListItemText primary="Video Quality" />
+                            <ArrowForward />
+                          </ListItemButton>
+                        </ListItem>
+                        <ListItem>
+                          <ListItemButton onClick={handleToggleSpeed}>
+                            <ListItemText primary="Playback Speed" />
+                            <ArrowForward />
+                          </ListItemButton>
+                        </ListItem>
+                      </>
+                    )}
+                  </List>
+                </>
+              }
+              open={
+                settingsMenu ||
+                changeAudio ||
+                changeSubtitles ||
+                changeQuality ||
+                changeSpeed
+              }
+              disableFocusListener
+              disableHoverListener
+              disableTouchListener
+            >
+              <IconButton onClick={handleToggleSettingsMenu}>
+                <Settings sx={{ fontSize: "1.75vw" }} />
+              </IconButton>
+            </Tooltip>
 
-          <IconButton onClick={handleFullscreen}>
-            {!fullscreen && <Fullscreen />}
-            {fullscreen && <FullscreenExit />}
-          </IconButton>
+            <IconButton onClick={handleFullscreen}>
+              {!fullscreen && <Fullscreen sx={{ fontSize: "1.75vw" }} />}
+              {fullscreen && <FullscreenExit sx={{ fontSize: "1.75vw" }} />}
+            </IconButton>
+          </Grid>
         </Grid>
       </Grid>
     </Box>
