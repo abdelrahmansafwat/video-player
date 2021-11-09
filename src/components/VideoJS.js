@@ -48,9 +48,11 @@ export const VideoJS = (props) => {
           }
         })
 
+        /*
         window.screen.orientation.lock("landscape").catch((err) => {
           console.log("Landscape not supported");
         });
+        */
         
         onReady && onReady(player);
       }));

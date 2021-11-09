@@ -89,9 +89,11 @@ const Controls = (props) => {
       console.log(player.readyState());
       console.log(player.qualityLevels());
 
-      window.screen.orientation.lock("landscape").catch((err) => {
-        console.log("Landscape not supported");
-      });
+      /*
+        window.screen.orientation.lock("landscape").catch((err) => {
+          console.log("Landscape not supported");
+        });
+        */
 
       //player.landscapeFullscreen();
 
@@ -135,9 +137,11 @@ const Controls = (props) => {
     } else {
       player.requestFullscreen();
 
-      window.screen.orientation.lock("landscape").catch((err) => {
-        console.log("Landscape not supported");
-      });
+      /*
+        window.screen.orientation.lock("landscape").catch((err) => {
+          console.log("Landscape not supported");
+        });
+        */
     }
     setFullscreen(!fullscreen);
   };
