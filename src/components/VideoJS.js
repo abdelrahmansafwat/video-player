@@ -42,7 +42,7 @@ export const VideoJS = (props) => {
         player.landscapeFullscreen({
           fullscreen: {
             enterOnRotate: true,
-            exitOnRotate: false,
+            exitOnRotate: true,
             alwaysInLandscapeMode: false,
             iOS: true
           }
