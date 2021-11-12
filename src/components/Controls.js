@@ -327,6 +327,11 @@ const Controls = (props) => {
 
   const handlePlaylistToggle = () => {
     setPlaylistOpen(!playlistOpen);
+    setSettingsMenu(false);
+    setChangeAudio(false);
+    setChangeSubtitles(false);
+    setChangeSpeed(false);
+    setChangeQuality(false);
   };
 
   const handleVideoChange = (selectedVideo) => {
@@ -338,7 +343,7 @@ const Controls = (props) => {
     });
     setVideo(selectedVideo);
     handlePlaylistToggle();
-    setStarted(false);
+    props.setPlaying(true);
   };
 
   return (

@@ -101,7 +101,7 @@ export const VideoJS = (props) => {
     <>
       <div id={"videojsContainer"} data-vjs-player ref={containerRef} onMouseOver={handleHoverEnter} onMouseLeave={handleHoverLeave} onClick={handleHoverEnter}>
         <video ref={videoRef} className="video-js vjs-big-play-centered" onClick={handlePlay} />
-        <Controls playerRef={playerRef} playing={playing} handlePlay={handlePlay} />
+        <Controls playerRef={playerRef} playing={playing} handlePlay={handlePlay} setPlaying={setPlaying} />
       </div>
     </>
   );
