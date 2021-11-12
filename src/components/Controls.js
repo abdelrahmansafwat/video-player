@@ -184,10 +184,11 @@ const Controls = (props) => {
     const player = playerRef.current;
     let currentSubtitles = ["None"];
 
-    playlist[video].subtitles.map((value, index) => {
-      player.addRemoteTextTrack(value);
-      currentSubtitles.push(value.label);
-      console.log("value.label", value.label);
+    player.textTracks().tracks_.map((value, index) => {
+      if(value.label != "segment-metadata"){
+        currentSubtitles.push(value.label);
+        console.log("value.label", value.label);
+      }
     });
 
     setSubtitlesList(currentSubtitles);
@@ -353,13 +354,13 @@ const Controls = (props) => {
   const handleSubtitlesChange = (selectedSubtitles) => {
     const player = playerRef.current;
 
-    console.log(player.remoteTextTracks());
+    console.log(player.textTracks());
 
-    player.remoteTextTracks().tracks_.map((value, index) => {
+    player.textTracks().tracks_.map((value, index) => {
       if (value.label == selectedSubtitles) {
-        player.remoteTextTracks().tracks_[index].mode = "showing";
+        player.textTracks().tracks_[index].mode = "showing";
       } else {
-        player.remoteTextTracks().tracks_[index].mode = "disabled";
+        player.textTracks().tracks_[index].mode = "disabled";
       }
     });
 
