@@ -4,6 +4,7 @@ import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import "videojs-contrib-quality-levels";
 import "videojs-landscape-fullscreen";
+import "@videojs/http-streaming";
 import Controls from "./Controls";
 
 export const VideoJS = (props) => {

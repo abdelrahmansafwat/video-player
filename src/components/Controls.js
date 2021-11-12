@@ -51,7 +51,9 @@ const Controls = (props) => {
   const [resolution, setResolution] = useState();
   const [speed, setSpeed] = useState(1);
   const [subtitles, setSubtitles] = useState("None");
+  const [subtitlesList, setSubtitlesList] = useState([]);
   const [audio, setAudio] = useState("English");
+  const [audioList, setAudioList] = useState("English");
   const [settingsMenu, setSettingsMenu] = useState(false);
   const [duration, setDuration] = useState("0:00");
   const [convertedTime, setConvertedTime] = useState("0:00");
@@ -63,18 +65,40 @@ const Controls = (props) => {
       url: "https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8",
       type: "application/x-mpegURL",
       image: "https://i.ibb.co/q7ZbgpG/firefox-Ld-Uv-Vmd-Nd2.png",
+      subtitles: []
     },
     {
       name: "Big Buck Bunny",
       url: "https://multiplatform-f.akamaihd.net/i/multi/will/bunny/big_buck_bunny_,640x360_400,640x360_700,640x360_1000,950x540_1500,.f4v.csmil/master.m3u8",
       type: "application/x-mpegURL",
       image: "https://i.ibb.co/VQMfYkw/firefox-YFgg5-BMBrj.png",
+      subtitles: []
     },
     {
       name: "Sintel",
-      url: "https://multiplatform-f.akamaihd.net/i/multi/april11/sintel/sintel-hd_,512x288_450_b,640x360_700_b,768x432_1000_b,1024x576_1400_m,.mp4.csmil/master.m3u8",
+      url: "https://bitmovin-a.akamaihd.net/content/sintel/hls/playlist.m3u8",
       type: "application/x-mpegURL",
       image: "https://i.ibb.co/JzmrGrY/firefox-r-ZUXf-Fa-SAp.png",
+      subtitles: [
+        {
+          kind: "subtitles",
+          src: "http://iandevlin.github.io/mdn/video-player-with-captions/subtitles/vtt/sintel-en.vtt",
+          srclang: "en",
+          label: "English",
+        },
+        {
+          kind: "subtitles",
+          src: "http://iandevlin.github.io/mdn/video-player-with-captions/subtitles/vtt/sintel-de.vtt",
+          srclang: "de",
+          label: "German",
+        },
+        {
+          kind: "subtitles",
+          src: "http://iandevlin.github.io/mdn/video-player-with-captions/subtitles/vtt/sintel-es.vtt",
+          srclang: "es",
+          label: "Spanish",
+        },
+      ],
     },
     {
       name: "Skate Phantom Flex",
@@ -120,6 +144,7 @@ const Controls = (props) => {
       console.log(player.qualityLevels());
 
       getResolutions();
+      getSubtitles();
 
       /*
         window.screen.orientation.lock("landscape").catch((err) => {
@@ -154,6 +179,32 @@ const Controls = (props) => {
         .width
     );
   };
+
+  const getSubtitles = () => {
+    const player = playerRef.current;
+    let currentSubtitles = ["None"];
+
+    playlist[video].subtitles.map((value, index) => {
+      player.addRemoteTextTrack(value);
+      currentSubtitles.push(value.label);
+      console.log("value.label", value.label);
+    });
+
+    setSubtitlesList(currentSubtitles);
+  }
+
+  const getAudio = () => {
+    const player = playerRef.current;
+    let currentAudio = [];
+
+    player.audioTracks().tracks_.map((value, index) => {
+      currentAudio.push(value.label);
+      console.log("value.label", value.label);
+    });
+
+    setAudioList(currentAudio);
+    setAudio(currentAudio[0]);
+  }
 
   if (!started) {
     autoPlay();
@@ -285,9 +336,35 @@ const Controls = (props) => {
     setConvertedTime(convertTime(player.currentTime() + 10));
   };
 
-  const handleAudioChange = (selectedAudio) => {};
+  const handleAudioChange = (selectedAudio) => {
+    const player = playerRef.current;
 
-  const handleSubtitlesChange = (slectedSubtitles) => {};
+    player.audioTracks().tracks_.map((value, index) => {
+      if (value.label == selectedAudio) {
+        player.audioTracks().tracks_[index].enabled = true;
+      } else {
+        player.audioTracks().tracks_[index].mode = false;
+      }
+    });
+
+    setAudio(selectedAudio);
+  };
+
+  const handleSubtitlesChange = (selectedSubtitles) => {
+    const player = playerRef.current;
+
+    console.log(player.remoteTextTracks());
+
+    player.remoteTextTracks().tracks_.map((value, index) => {
+      if (value.label == selectedSubtitles) {
+        player.remoteTextTracks().tracks_[index].mode = "showing";
+      } else {
+        player.remoteTextTracks().tracks_[index].mode = "disabled";
+      }
+    });
+
+    setSubtitles(selectedSubtitles);
+  };
 
   const handleSpeedChange = (selectedSpeed) => {
     const player = playerRef.current;
@@ -302,11 +379,16 @@ const Controls = (props) => {
   };
 
   const handleToggleAudio = () => {
+    const player = playerRef.current;
+
+    console.log("player.audioTracks()", player.audioTracks());
+    getAudio();
     setChangeAudio(true);
     setSettingsMenu(false);
   };
 
   const handleToggleSubtitles = () => {
+    getSubtitles();
     setChangeSubtitles(true);
     setSettingsMenu(false);
   };
@@ -353,7 +435,7 @@ const Controls = (props) => {
           sx: {
             backgroundColor: "rgba(0,0,0,0.6)",
             color: "white",
-            padding: 1
+            padding: 1,
           },
         }}
         anchor="right"
@@ -378,14 +460,14 @@ const Controls = (props) => {
                       width: 180,
                       height: 150,
                       borderRadius: 5,
-                      color: "white"
+                      color: "white",
                     }
                   : {
                       backgroundColor: "rgba(0, 0, 0, 0.6)",
                       width: 180,
                       height: 150,
                       borderRadius: 5,
-                      color: "white"
+                      color: "white",
                     }
               }
               onClick={() => handleVideoChange(index)}
@@ -565,7 +647,7 @@ const Controls = (props) => {
                       }}
                     >
                       {changeSubtitles &&
-                        ["None"].map((value, index) => (
+                        subtitlesList.map((value, index) => (
                           <ListItem
                             disablePadding
                             sx={
@@ -582,7 +664,7 @@ const Controls = (props) => {
                           </ListItem>
                         ))}
                       {changeAudio &&
-                        ["English"].map((value, index) => (
+                        audioList.map((value, index) => (
                           <ListItem
                             disablePadding
                             sx={
